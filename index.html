@@ -1,0 +1,2708 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Jobbportal — personlig jobbsökare för lager och chaufför i Stockholm" />
+  <title>Jobbportal · Tawakkul Al-Allah</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600&family=Geist:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <style>
+/* ═══════════════════════════════════════════════════════
+   RESET + CUSTOM PROPERTIES
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0b1326;
+  --surface-low: #131b2e;
+  --surface-mid: #171f33;
+  --surface-high: #222a3d;
+  --surface-highest: #2d3449;
+  --surface-bright: #31394d;
+
+  --primary: #ff5b5b;
+  --primary-container: #dc2626;
+  --secondary: #ff8a8a;
+  --secondary-container: #7f1d1d;
+  --primary-glow: rgba(255,91,91,.4);
+  --primary-dim: rgba(255,91,91,.12);
+  --primary-border: rgba(255,91,91,.4);
+
+  --lager: #4edea3;
+  --lager-dim: rgba(78,222,163,.12);
+  --lager-border: rgba(78,222,163,.35);
+  --lager-glow: rgba(78,222,163,.22);
+
+  --chauffeur: #8083ff;
+  --chauffeur-dim: rgba(128,131,255,.12);
+  --chauffeur-border: rgba(128,131,255,.35);
+  --chauffeur-glow: rgba(128,131,255,.22);
+
+  --ansökt-color: #4edea3;
+  --ansökt-border: rgba(78,222,163,.5);
+  --ansökt-bg: rgba(78,222,163,.1);
+
+  --sparad-color: #fbbf24;
+  --sparad-border: rgba(251,191,36,.5);
+  --sparad-bg: rgba(251,191,36,.1);
+
+  --skrap-color: #f87171;
+  --skrap-border: rgba(248,113,113,.5);
+  --skrap-bg: rgba(248,113,113,.1);
+
+  --urgent: #ffb4ab;
+  --urgent-bg: rgba(255,180,171,.12);
+  --soon: #fbbf24;
+  --soon-bg: rgba(251,191,36,.12);
+
+  --on-surface: #dae2fd;
+  --on-surface-dim: #c7c4d7;
+  --outline: #908fa0;
+  --outline-dim: #464554;
+
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
+
+  --glass-bg: rgba(23,31,51,.6);
+  --glass-border: rgba(255,255,255,.08);
+  --glass-blur: blur(20px);
+
+  --r-sm: 8px;
+  --r: 12px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-full: 9999px;
+
+  --t: 200ms ease;
+  --t-slow: 400ms ease;
+  --shadow-card: 0 4px 32px rgba(0,0,0,.4);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--on-surface);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════ */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+.hidden { display: none !important; }
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-flex;
+  vertical-align: middle;
+  user-select: none;
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+}
+
+/* ═══════════════════════════════════════════════════════
+   STAR FIELD + AURORA
+═══════════════════════════════════════════════════════ */
+#star-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+}
+
+#aurora {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 30%, rgba(111,0,190,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 15%, rgba(192,193,255,.12) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 40% at 50% 90%, rgba(78,222,163,.06) 0%, transparent 55%);
+  animation: aurora-drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift {
+  0%   { opacity: .7; transform: scale(1) rotate(0deg); }
+  50%  { opacity: 1; transform: scale(1.05) rotate(1deg); }
+  100% { opacity: .8; transform: scale(.97) rotate(-1deg); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: .15; transform: scale(.8); }
+  50%       { opacity: .9; transform: scale(1.3); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   HEADER / HERO
+═══════════════════════════════════════════════════════ */
+#app-header {
+  position: relative;
+  z-index: 10;
+  padding: 2rem 1.5rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  text-align: center;
+  border-bottom: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+#app-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(11,19,38,.85) 0%, rgba(11,19,38,.6) 60%, rgba(11,19,38,.9) 100%);
+  z-index: -1;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.logo {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--on-surface);
+  text-decoration: none;
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+.logo em { font-style: italic; color: var(--primary); }
+
+.batch-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--on-surface-dim);
+  background: rgba(45,52,73,.5);
+  border: 1px solid var(--outline-dim);
+  border-radius: var(--r-full);
+  padding: 4px 12px;
+  letter-spacing: .04em;
+  backdrop-filter: blur(8px);
+}
+
+/* Glass Video Hero */
+.hero-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  min-height: clamp(420px, 60vh, 640px);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 60px rgba(0,0,0,.5);
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: hue-rotate(310deg) saturate(1.35);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse at center, rgba(11,19,38,.35) 0%, rgba(11,19,38,.85) 80%),
+    linear-gradient(to bottom, rgba(11,19,38,.5) 0%, rgba(11,19,38,.8) 100%);
+  backdrop-filter: blur(2px);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  height: 38px;
+  padding: 0 .9rem;
+  border-radius: var(--r-sm);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255,91,91,.14);
+  border: 1px solid var(--primary-border);
+  box-shadow: 0 0 24px var(--primary-glow), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.hero-pill-badge {
+  background: var(--primary-container);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+.hero-pill-text {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: .06em;
+  color: var(--on-surface);
+}
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -.025em;
+  color: #fff;
+  background: linear-gradient(170deg, #ffffff 20%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 40px var(--primary-glow));
+  margin-top: .25rem;
+  max-width: 60rem;
+}
+.hero-title em {
+  font-style: italic;
+  font-weight: 500;
+  margin-left: .08em;
+}
+
+.hero-sub {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--on-surface-dim);
+  margin-top: .35rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   STAT CARDS
+═══════════════════════════════════════════════════════ */
+.stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  justify-content: center;
+  width: 100%;
+  max-width: 900px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: .6rem 1.1rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  min-width: 72px;
+  transition: var(--t);
+}
+
+.stat-card.clickable {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+}
+.stat-card.clickable:hover { background: rgba(255,255,255,.06); transform: translateY(-2px); }
+.stat-card.clickable.active { box-shadow: 0 0 0 2px var(--primary); }
+
+.stat-num {
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--on-surface);
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--on-surface-dim);
+  text-transform: uppercase;
+}
+
+.stat-card.lager .stat-num    { color: var(--lager); }
+.stat-card.chauffeur .stat-num { color: var(--chauffeur); }
+.stat-card.urgent .stat-num    { color: var(--urgent); }
+.stat-card.ansökt  .stat-num   { color: var(--ansökt-color); }
+.stat-card.sparade .stat-num   { color: var(--sparad-color); }
+.stat-card.skrapped .stat-num  { color: var(--skrap-color); }
+
+/* ═══════════════════════════════════════════════════════
+   ACTION BUTTONS
+═══════════════════════════════════════════════════════ */
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: .7rem 1.6rem;
+  border: none;
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--t);
+  background: linear-gradient(135deg, var(--primary-container), var(--secondary-container));
+  color: #fff;
+  box-shadow: 0 0 24px var(--primary-glow), inset 0 1px 0 rgba(255,255,255,.2);
+  border-top: 1px solid rgba(255,255,255,.25);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(255,91,91,.6), inset 0 1px 0 rgba(255,255,255,.2); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+.btn-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: .65rem 1.2rem;
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--t);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  color: var(--on-surface);
+}
+.btn-glass:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.15); }
+
+.btn-icon {
+  padding: .65rem;
+  width: 42px;
+  height: 42px;
+  justify-content: center;
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: .5rem 1rem;
+  border: 1px solid var(--skrap-border);
+  border-radius: var(--r-sm);
+  background: var(--skrap-bg);
+  color: var(--skrap-color);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--t);
+}
+.btn-danger:hover { background: rgba(248,113,113,.2); }
+
+/* ═══════════════════════════════════════════════════════
+   FILTER BAR (STICKY)
+═══════════════════════════════════════════════════════ */
+#filter-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(13,27,46,.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 4px 24px rgba(0,0,0,.3);
+}
+
+.filter-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: .85rem 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .65rem;
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+  max-width: 280px;
+}
+.search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--outline);
+  font-size: 18px;
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: .5rem .75rem .5rem 2.4rem;
+  background: var(--surface-mid);
+  border: 1px solid var(--outline-dim);
+  border-radius: var(--r-full);
+  color: var(--on-surface);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  outline: none;
+  transition: var(--t);
+}
+.search-input::placeholder { color: var(--outline); }
+.search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(192,193,255,.12); }
+
+.chip-group { display: flex; gap: .4rem; align-items: center; }
+.chip-divider { width: 1px; height: 20px; background: var(--outline-dim); margin: 0 .25rem; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: .35rem .85rem;
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--t);
+  border: 1px solid var(--outline-dim);
+  background: var(--surface-mid);
+  color: var(--on-surface-dim);
+  white-space: nowrap;
+}
+.chip:hover { border-color: var(--outline); color: var(--on-surface); }
+.chip.chip-active, .chip[data-active="true"] { background: var(--surface-highest); border-color: var(--primary); color: var(--primary); }
+.chip[data-cat="Lager"][data-active="true"] { border-color: var(--lager); color: var(--lager); background: var(--lager-dim); }
+.chip[data-cat="Chaufför"][data-active="true"] { border-color: var(--chauffeur); color: var(--chauffeur); background: var(--chauffeur-dim); }
+.chip[data-status="a"][data-active="true"] { border-color: var(--ansökt-border); color: var(--ansökt-color); background: var(--ansökt-bg); }
+.chip[data-status="s"][data-active="true"] { border-color: var(--sparad-border); color: var(--sparad-color); background: var(--sparad-bg); }
+.chip[data-status="x"][data-active="true"] { border-color: var(--skrap-border); color: var(--skrap-color); background: var(--skrap-bg); }
+
+.sort-select {
+  padding: .4rem .9rem;
+  background: var(--surface-mid);
+  border: 1px solid var(--outline-dim);
+  border-radius: var(--r-sm);
+  color: var(--on-surface);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: var(--t);
+}
+.sort-select:focus { border-color: var(--primary); }
+
+.result-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--outline);
+  letter-spacing: .05em;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MAIN + JOB GRID
+═══════════════════════════════════════════════════════ */
+#main-content {
+  position: relative;
+  z-index: 5;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 6rem;
+  min-height: 60vh;
+}
+
+.grid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+#job-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-flow: dense;
+  gap: 1rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   JOB CARDS — BENTO STYLE
+═══════════════════════════════════════════════════════ */
+.job-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+  transition: transform 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
+  animation: card-in .4s ease both;
+  will-change: transform;
+}
+.job-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,0,0,.45), 0 0 24px var(--primary-glow);
+  border-color: rgba(255,91,91,.25);
+}
+
+/* Featured card spans 2 columns (deadline soon/urgent) */
+.job-card.featured { grid-column: span 2; }
+
+/* Radial-dot pattern overlay — bento hover signature */
+.job-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at center, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+.job-card:hover::before,
+.job-card.featured::before { opacity: 1; }
+
+/* Gradient ring on hover */
+.job-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-md);
+  padding: 1px;
+  background: linear-gradient(135deg, transparent, rgba(255,91,91,.25), transparent 60%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.job-card:hover::after,
+.job-card.featured::after { opacity: 1; }
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-stripe {
+  height: 2px;
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+.job-card.cat-lager .card-stripe { background: var(--lager); }
+.job-card.cat-chauffeur .card-stripe { background: var(--chauffeur); }
+
+.card-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1rem;
+  gap: .75rem;
+}
+
+/* Bento top row: icon chip + status pill */
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+.card-icon-chip {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,.06);
+  transition: background 300ms ease;
+  flex-shrink: 0;
+}
+.job-card:hover .card-icon-chip {
+  background: linear-gradient(135deg, var(--primary-dim), rgba(255,91,91,.05));
+}
+.card-icon-chip .material-symbols-outlined {
+  font-size: 18px;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+.job-card.cat-lager .card-icon-chip .material-symbols-outlined { color: var(--lager); }
+.job-card.cat-chauffeur .card-icon-chip .material-symbols-outlined { color: var(--chauffeur); }
+
+/* Status pill (deadline) — bento style */
+.card-status-pill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  backdrop-filter: blur(8px);
+  background: rgba(255,255,255,.06);
+  color: var(--on-surface-dim);
+  border: 1px solid rgba(255,255,255,.08);
+  transition: background 300ms ease;
+  white-space: nowrap;
+}
+.job-card:hover .card-status-pill { background: rgba(255,255,255,.12); }
+.card-status-pill.urgent { background: var(--urgent-bg); color: var(--urgent); border-color: rgba(255,180,171,.3); }
+.card-status-pill.soon { background: var(--soon-bg); color: var(--soon); border-color: rgba(251,191,36,.3); }
+
+/* Title + inline meta */
+.card-title-block { display: flex; flex-direction: column; gap: 4px; }
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -.005em;
+  color: var(--on-surface);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.job-card.featured .card-title {
+  font-size: 1.25rem;
+  -webkit-line-clamp: 3;
+}
+.card-employer {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--outline);
+  letter-spacing: .02em;
+}
+
+.card-desc {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--on-surface-dim);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.job-card.featured .card-desc { -webkit-line-clamp: 3; }
+
+/* Tags row + Explore CTA */
+.card-tags-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-top: auto;
+}
+.card-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.card-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,.05);
+  color: var(--on-surface-dim);
+  letter-spacing: .02em;
+  transition: background 200ms ease;
+}
+.card-tag:hover { background: rgba(255,255,255,.1); }
+.card-explore {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: .04em;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  white-space: nowrap;
+}
+.job-card:hover .card-explore { opacity: 1; }
+
+.card-footer {
+  border-top: 1px solid rgba(255,255,255,.06);
+  padding-top: .75rem;
+  margin-top: .25rem;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+
+.open-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--primary);
+  text-decoration: none;
+  transition: var(--t);
+}
+.open-link:hover { color: var(--secondary); }
+.open-link .material-symbols-outlined { font-size: 15px; }
+
+/* Legacy badge classes still used elsewhere */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 9px;
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.badge-lager { background: var(--lager-dim); color: var(--lager); border: 1px solid var(--lager-border); }
+.badge-chauffeur { background: var(--chauffeur-dim); color: var(--chauffeur); border: 1px solid var(--chauffeur-border); }
+.badge-urgent { background: var(--urgent-bg); color: var(--urgent); border: 1px solid rgba(255,180,171,.3); }
+.badge-soon { background: var(--soon-bg); color: var(--soon); border: 1px solid rgba(251,191,36,.3); }
+.badge-neutral { background: rgba(144,143,160,.1); color: var(--outline); border: 1px solid rgba(144,143,160,.2); }
+
+.btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .4rem; position: relative; z-index: 2; }
+
+.btn-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: .5rem .25rem;
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--t);
+  border: 1px solid var(--outline-dim);
+  background: var(--surface-high);
+  color: var(--on-surface-dim);
+  line-height: 1.2;
+}
+.btn-status .material-symbols-outlined { font-size: 13px; }
+.btn-status:hover { transform: scale(1.04); }
+
+.btn-status.btn-ansökt:hover, .btn-status.btn-ansökt.active {
+  background: var(--ansökt-bg); border-color: var(--ansökt-border); color: var(--ansökt-color);
+  box-shadow: 0 0 10px rgba(78,222,163,.3);
+}
+.btn-status.btn-sparad:hover, .btn-status.btn-sparad.active {
+  background: var(--sparad-bg); border-color: var(--sparad-border); color: var(--sparad-color);
+  box-shadow: 0 0 10px rgba(251,191,36,.3);
+}
+.btn-status.btn-skrap:hover, .btn-status.btn-skrap.active {
+  background: var(--skrap-bg); border-color: var(--skrap-border); color: var(--skrap-color);
+  box-shadow: 0 0 10px rgba(248,113,113,.3);
+}
+
+/* Card status states */
+.job-card.status-a { border-color: var(--ansökt-border); box-shadow: var(--shadow-card), 0 0 20px var(--lager-glow); }
+.job-card.status-s { border-color: var(--sparad-border); box-shadow: var(--shadow-card), 0 0 20px rgba(251,191,36,.15); }
+.job-card.status-x { border-color: var(--skrap-border); opacity: .55; }
+.job-card.status-x .card-title { text-decoration: line-through; }
+
+/* ═══════════════════════════════════════════════════════
+   SHORT SUPPLY BANNER
+═══════════════════════════════════════════════════════ */
+.supply-banner {
+  grid-column: 1/-1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(251,191,36,.08);
+  border: 1px solid rgba(251,191,36,.25);
+  border-radius: var(--r);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--soon);
+}
+
+/* ═══════════════════════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════════════════════ */
+#empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 2rem;
+  gap: 1.25rem;
+}
+.empty-icon {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--surface-mid);
+  border: 1px solid var(--outline-dim);
+  display: flex; align-items: center; justify-content: center;
+}
+.empty-icon .material-symbols-outlined { font-size: 36px; color: var(--outline); }
+#empty-state h2 {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+#empty-state p { color: var(--on-surface-dim); font-size: 13.5px; max-width: 380px; }
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════ */
+footer {
+  position: relative;
+  z-index: 5;
+  border-top: 1px solid var(--glass-border);
+  background: var(--surface-low);
+  padding: 1.25rem 1.5rem;
+  padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
+}
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.footer-inner span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--outline);
+  letter-spacing: .04em;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE NAV
+═══════════════════════════════════════════════════════ */
+#mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(13,19,38,.9);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--glass-border);
+  padding: .5rem .5rem calc(.5rem + env(safe-area-inset-bottom));
+  z-index: 50;
+  justify-content: space-around;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.4);
+}
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: .4rem .75rem;
+  border: none;
+  background: none;
+  color: var(--outline);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: var(--t);
+}
+.mobile-nav-item .material-symbols-outlined { font-size: 22px; }
+.mobile-nav-item.active, .mobile-nav-item:hover { color: var(--primary); background: rgba(192,193,255,.08); }
+
+/* ═══════════════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(6,14,32,.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: modal-fade .2s ease;
+}
+@keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-box {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface-low);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: 2rem;
+  box-shadow: 0 24px 80px rgba(0,0,0,.6);
+  animation: modal-slide .25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+@keyframes modal-slide { from { transform: translateY(16px) scale(.97); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+
+.modal-title {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+.modal-body { font-size: 13.5px; color: var(--on-surface-dim); line-height: 1.6; }
+.modal-body code { font-family: var(--font-mono); font-size: 12px; background: var(--surface-high); padding: 1px 5px; border-radius: 4px; }
+.modal-actions { display: flex; gap: .75rem; justify-content: flex-end; flex-wrap: wrap; }
+
+.dropzone {
+  border: 2px dashed var(--outline-dim);
+  border-radius: var(--r);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--t);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  color: var(--on-surface-dim);
+  font-size: 13px;
+}
+.dropzone:hover, .dropzone.drag-over { border-color: var(--primary); background: rgba(192,193,255,.05); color: var(--primary); }
+.dropzone .material-symbols-outlined { font-size: 32px; color: var(--outline); }
+
+.migration-file-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--lager);
+  text-align: center;
+}
+
+.settings-field { display: flex; flex-direction: column; gap: .4rem; }
+.settings-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--on-surface-dim);
+}
+.settings-input {
+  width: 100%;
+  padding: .6rem .9rem;
+  background: var(--surface-high);
+  border: 1px solid var(--outline-dim);
+  border-radius: var(--r-sm);
+  color: var(--on-surface);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+  transition: var(--t);
+}
+.settings-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(192,193,255,.1); }
+
+.supabase-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: .5rem .75rem;
+  border-radius: var(--r-sm);
+  text-align: center;
+}
+.supabase-status.connected { background: var(--lager-dim); color: var(--lager); border: 1px solid var(--lager-border); }
+.supabase-status.offline { background: var(--skrap-bg); color: var(--skrap-color); border: 1px solid var(--skrap-border); }
+
+.danger-zone { border-top: 1px solid var(--outline-dim); padding-top: 1rem; text-align: center; }
+
+/* ═══════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════ */
+#toast-container {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  pointer-events: none;
+  width: max-content;
+  max-width: 90vw;
+}
+
+.toast {
+  padding: .65rem 1.25rem;
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  background: var(--surface-highest);
+  border: 1px solid var(--glass-border);
+  color: var(--on-surface);
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  backdrop-filter: blur(16px);
+  animation: toast-in .25s ease;
+  pointer-events: auto;
+  white-space: nowrap;
+}
+.toast.success { background: rgba(78,222,163,.15); border-color: var(--lager-border); color: var(--lager); }
+.toast.error   { background: var(--skrap-bg); border-color: var(--skrap-border); color: var(--skrap-color); }
+.toast.warn    { background: var(--sparad-bg); border-color: var(--sparad-border); color: var(--sparad-color); }
+.toast.out { animation: toast-out .25s ease forwards; }
+
+@keyframes toast-in  { from { opacity: 0; transform: translateY(10px) scale(.95); } to { opacity: 1; transform: none; } }
+@keyframes toast-out { from { opacity: 1; } to { opacity: 0; transform: translateY(-6px); } }
+
+/* ═══════════════════════════════════════════════════════
+   SYNC INDICATOR
+═══════════════════════════════════════════════════════ */
+#sync-indicator {
+  position: fixed;
+  top: .75rem;
+  right: .75rem;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .35rem .75rem;
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  background: rgba(248,113,113,.12);
+  border: 1px solid var(--skrap-border);
+  color: var(--skrap-color);
+}
+#sync-indicator .material-symbols-outlined { font-size: 14px; animation: spin 2s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══════════════════════════════════════════════════════
+   SEARCH OVERLAY
+═══════════════════════════════════════════════════════ */
+#search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6,14,32,.75);
+  backdrop-filter: blur(6px);
+}
+.search-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2.5rem 3rem;
+  background: var(--surface-low);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  box-shadow: 0 24px 80px rgba(0,0,0,.6);
+  text-align: center;
+}
+.search-spinner {
+  width: 48px; height: 48px;
+  border: 3px solid var(--outline-dim);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.search-status {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+.search-queries {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--on-surface-dim);
+  letter-spacing: .04em;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SKELETON LOADER
+═══════════════════════════════════════════════════════ */
+.skeleton-card {
+  background: var(--surface-mid);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  padding: 1.1rem;
+  height: 280px;
+  animation: shimmer 1.5s ease infinite;
+}
+@keyframes shimmer {
+  0%, 100% { opacity: .5; }
+  50%       { opacity: .8; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  #job-grid { grid-template-columns: repeat(2, 1fr); }
+  .job-card.featured { grid-column: span 2; }
+}
+@media (max-width: 700px) {
+  #job-grid { grid-template-columns: 1fr; }
+  .job-card.featured { grid-column: span 1; }
+  .job-card.featured .card-title { font-size: 1.1rem; }
+  #mobile-nav { display: flex; }
+  #main-content { padding-bottom: 7rem; }
+  .filter-inner { gap: .5rem; }
+  .search-wrap { max-width: 100%; }
+  .action-row { gap: .5rem; }
+  .hero-title { font-size: clamp(2.2rem, 12vw, 3.5rem); }
+  .stats-row { gap: .45rem; }
+  .stat-card { padding: .5rem .7rem; min-width: 60px; }
+  .stat-num { font-size: 1.35rem; }
+  #toast-container { bottom: 6rem; }
+  #sync-indicator { top: auto; bottom: 4.5rem; right: .75rem; }
+}
+@media (max-width: 420px) {
+  .chip-group { gap: .3rem; }
+  .chip { padding: .3rem .6rem; font-size: 9px; }
+  .modal-box { padding: 1.5rem; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CARD STAGGER ANIMATION
+═══════════════════════════════════════════════════════ */
+.job-card:nth-child(1)  { animation-delay: .03s; }
+.job-card:nth-child(2)  { animation-delay: .06s; }
+.job-card:nth-child(3)  { animation-delay: .09s; }
+.job-card:nth-child(4)  { animation-delay: .12s; }
+.job-card:nth-child(5)  { animation-delay: .15s; }
+.job-card:nth-child(6)  { animation-delay: .18s; }
+.job-card:nth-child(7)  { animation-delay: .21s; }
+.job-card:nth-child(8)  { animation-delay: .24s; }
+.job-card:nth-child(9)  { animation-delay: .27s; }
+.job-card:nth-child(10) { animation-delay: .30s; }
+.job-card:nth-child(n+11) { animation-delay: .33s; }
+  </style>
+</head>
+<body>
+
+<div id="star-field" aria-hidden="true"></div>
+<div id="aurora" aria-hidden="true"></div>
+
+<!-- ═══ HEADER / HERO ═══ -->
+<header id="app-header">
+  <div class="header-top">
+    <a class="logo" href="#" aria-label="Jobbportal hem">Jobb<em>portal</em></a>
+    <span id="batch-badge" class="batch-badge">Laddar…</span>
+  </div>
+
+  <div class="hero-wrap">
+    <video class="hero-video" autoplay loop muted playsinline aria-hidden="true">
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260210_031346_d87182fb-b0af-4273-84d1-c6fd17d6bf0f.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay" aria-hidden="true"></div>
+    <div class="hero-content">
+      <div class="hero-pill">
+        <span class="hero-pill-badge">New</span>
+        <span class="hero-pill-text">Stockholm · Lager &amp; Chaufför</span>
+      </div>
+      <h1 class="hero-title">Job <em>portal</em></h1>
+      <p class="hero-sub">Tawakkul Al-Allah</p>
+    </div>
+  </div>
+
+  <div id="stats-row" class="stats-row">
+    <div class="stat-card">
+      <span class="stat-num" id="stat-totalt">0</span>
+      <span class="stat-label">Totalt</span>
+    </div>
+    <div class="stat-card lager">
+      <span class="stat-num" id="stat-lager">0</span>
+      <span class="stat-label">Lager</span>
+    </div>
+    <div class="stat-card chauffeur">
+      <span class="stat-num" id="stat-chauffeur">0</span>
+      <span class="stat-label">Chaufför</span>
+    </div>
+    <div class="stat-card urgent">
+      <span class="stat-num" id="stat-urgent">0</span>
+      <span class="stat-label">Stänger snart</span>
+    </div>
+    <button class="stat-card clickable ansökt" id="btn-stat-ansökt" aria-label="Filtrera ansökta jobb">
+      <span class="stat-num" id="stat-ansökt">0</span>
+      <span class="stat-label">Ansökt</span>
+    </button>
+    <button class="stat-card clickable sparade" id="btn-stat-sparade" aria-label="Filtrera sparade jobb">
+      <span class="stat-num" id="stat-sparade">0</span>
+      <span class="stat-label">Sparade</span>
+    </button>
+    <button class="stat-card clickable skrapped" id="btn-stat-skrapped" aria-label="Filtrera skrappade jobb">
+      <span class="stat-num" id="stat-skrapped">0</span>
+      <span class="stat-label">Skrapped</span>
+    </button>
+  </div>
+
+  <div class="action-row">
+    <button id="btn-sök-jobb" class="btn-primary">
+      <span class="material-symbols-outlined">search</span>
+      Sök Jobb
+    </button>
+    <button id="btn-export" class="btn-glass">
+      <span class="material-symbols-outlined">download</span>
+      Exportera backup
+    </button>
+    <label class="btn-glass" role="button" tabindex="0" style="cursor:pointer;">
+      <span class="material-symbols-outlined">upload</span>
+      Importera backup
+      <input type="file" id="input-import-backup" accept=".json" class="sr-only" />
+    </label>
+    <button id="btn-settings" class="btn-glass btn-icon" aria-label="Inställningar">
+      <span class="material-symbols-outlined">settings</span>
+    </button>
+  </div>
+</header>
+
+<!-- ═══ FILTER BAR ═══ -->
+<div id="filter-bar" role="search">
+  <div class="filter-inner">
+    <div class="search-wrap">
+      <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+      <input type="text" id="input-search" class="search-input" placeholder="Sök titel, företag, ort…" autocomplete="off" aria-label="Sök bland jobb" />
+    </div>
+
+    <div class="chip-divider" aria-hidden="true"></div>
+
+    <div class="chip-group" role="group" aria-label="Kategorier">
+      <button class="chip" data-cat="all" id="chip-all" data-active="true">Alla</button>
+      <button class="chip" data-cat="Lager" id="chip-lager">Lager</button>
+      <button class="chip" data-cat="Chaufför" id="chip-chauffeur">Chaufför</button>
+    </div>
+
+    <div class="chip-divider" aria-hidden="true"></div>
+
+    <div class="chip-group" role="group" aria-label="Statusfilter">
+      <button class="chip" data-status="a" id="chip-ansökt" aria-pressed="false">✓ Ansökt</button>
+      <button class="chip" data-status="s" id="chip-sparade" aria-pressed="false">★ Sparade</button>
+      <button class="chip" data-status="x" id="chip-skrapped" aria-pressed="false">✕ Skrapped</button>
+    </div>
+
+    <select id="select-sort" class="sort-select" aria-label="Sortera">
+      <option value="deadline">Sortera: Deadline</option>
+      <option value="company">Sortera: Företag</option>
+      <option value="location">Sortera: Ort</option>
+      <option value="status">Sortera: Status</option>
+      <option value="batch">Sortera: Batch</option>
+    </select>
+
+    <span id="result-count" class="result-count" aria-live="polite">0 annonser</span>
+  </div>
+</div>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<main id="main-content" aria-label="Jobbannonser">
+  <div id="job-grid" aria-label="Jobbkort"></div>
+  <div id="empty-state" class="hidden" aria-live="polite">
+    <div class="empty-icon" aria-hidden="true">
+      <span class="material-symbols-outlined">search_off</span>
+    </div>
+    <h2>Inga annonser att visa</h2>
+    <p id="empty-state-msg">Klicka på 'Sök Jobb' för att hämta 50 nya annonser från Arbetsförmedlingen.</p>
+    <button class="btn-primary" id="btn-sök-empty">
+      <span class="material-symbols-outlined">search</span>
+      Sök Jobb
+    </button>
+  </div>
+</main>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-inner">
+    <span>Källa: Arbetsförmedlingen Platsbanken</span>
+    <span id="footer-sync">Senast synkad: –</span>
+  </div>
+</footer>
+
+<!-- ═══ MOBILE NAV ═══ -->
+<nav id="mobile-nav" aria-label="Mobilnavigation">
+  <button class="mobile-nav-item active" id="mnav-home" aria-label="Alla jobb">
+    <span class="material-symbols-outlined">home</span>
+    <span>Hem</span>
+  </button>
+  <button class="mobile-nav-item" id="mnav-search" aria-label="Sök jobb">
+    <span class="material-symbols-outlined">search</span>
+    <span>Sök</span>
+  </button>
+  <button class="mobile-nav-item" id="mnav-saved" aria-label="Sparade jobb">
+    <span class="material-symbols-outlined">bookmark</span>
+    <span>Sparade</span>
+  </button>
+  <button class="mobile-nav-item" id="mnav-applied" aria-label="Ansökta jobb">
+    <span class="material-symbols-outlined">send</span>
+    <span>Ansökta</span>
+  </button>
+</nav>
+
+<!-- ═══ SYNC INDICATOR ═══ -->
+<div id="sync-indicator" class="hidden" aria-live="polite" aria-label="Synkstatus">
+  <span class="material-symbols-outlined">sync_problem</span>
+  <span id="sync-text">Offline — Sync pending</span>
+</div>
+
+<!-- ═══ TOAST CONTAINER ═══ -->
+<div id="toast-container" aria-live="assertive" aria-atomic="false"></div>
+
+<!-- ═══ MODAL: CONFIRM SÖK JOBB ═══ -->
+<div id="modal-confirm" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+  <div class="modal-box">
+    <h2 class="modal-title" id="confirm-title">Hämta 50 nya jobb?</h2>
+    <p class="modal-body">Detta arkiverar de nuvarande jobben och hämtar 50 nya. Tidigare statusar (Ansökt, Sparad, Skrap) sparas automatiskt.</p>
+    <div class="modal-actions">
+      <button class="btn-glass" id="btn-confirm-cancel">Avbryt</button>
+      <button class="btn-primary" id="btn-confirm-ok">
+        <span class="material-symbols-outlined">search</span>
+        Ja, hämta nya
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: MIGRATION ═══ -->
+<div id="modal-migration" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="migration-title">
+  <div class="modal-box">
+    <h2 class="modal-title" id="migration-title">Välkommen till Jobbportal v3</h2>
+    <p class="modal-body">Importera din tidigare <code>seen_jobs.json</code> (eller backup) så att du inte ser samma jobb igen. Du kan hoppa över om du vill börja från noll.</p>
+    <div class="dropzone" id="migration-dropzone" role="button" tabindex="0" aria-label="Välj fil att importera">
+      <span class="material-symbols-outlined">upload_file</span>
+      <p>Dra &amp; släpp fil här, eller klicka för att välja</p>
+      <input type="file" id="input-migration-file" accept=".json" class="sr-only" />
+    </div>
+    <p class="migration-file-name hidden" id="migration-file-name"></p>
+    <div class="modal-actions">
+      <button class="btn-glass" id="btn-migration-skip">Hoppa över</button>
+      <button class="btn-primary" id="btn-migration-import" disabled>
+        <span class="material-symbols-outlined">upload</span>
+        Importera
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: SETTINGS ═══ -->
+<div id="modal-settings" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+  <div class="modal-box">
+    <h2 class="modal-title" id="settings-title">Inställningar</h2>
+    <div class="settings-field">
+      <label class="settings-label" for="input-supabase-url">Supabase URL</label>
+      <input type="url" id="input-supabase-url" class="settings-input" placeholder="https://xxxx.supabase.co" autocomplete="off" />
+    </div>
+    <div class="settings-field">
+      <label class="settings-label" for="input-supabase-key">Supabase Anon Key</label>
+      <input type="password" id="input-supabase-key" class="settings-input" placeholder="eyJh..." autocomplete="off" />
+    </div>
+    <div class="supabase-status" id="supabase-status-display"></div>
+    <div class="modal-actions">
+      <button class="btn-glass" id="btn-settings-cancel">Stäng</button>
+      <button class="btn-primary" id="btn-settings-save">
+        <span class="material-symbols-outlined">save</span>
+        Spara
+      </button>
+    </div>
+    <div class="danger-zone">
+      <button class="btn-danger" id="btn-reset-all">
+        <span class="material-symbols-outlined">delete_forever</span>
+        Återställ allt data
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SEARCH OVERLAY ═══ -->
+<div id="search-overlay" class="hidden" role="status" aria-label="Söker jobb">
+  <div class="search-progress">
+    <div class="search-spinner" aria-hidden="true"></div>
+    <p class="search-status" id="search-status-text">Söker…</p>
+    <p class="search-queries" id="search-queries-text">Förbereder 10 sökfrågor</p>
+  </div>
+</div>
+
+<script type="module">
+// ═══════════════════════════════════════════════════════
+// IMPORTS
+// ═══════════════════════════════════════════════════════
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// ═══════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════
+const CONFIG = {
+  SUPABASE_URL: 'YOUR_SUPABASE_URL',
+  SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_KEY',
+  API_BASE: 'https://jobsearch.api.jobtechdev.se',
+  REGION: 'CifL_Rzy_Mku',
+  TARGET_PER_CATEGORY: 25,
+  SEARCH_QUERIES: {
+    Lager: ['lagerarbetare','lagermedarbetare','orderplockare','terminalarbetare','godsmottagning'],
+    Chaufför: ['budbilsförare','budbilschaufför','chaufför B-körkort','distributionsförare','leveransförare']
+  },
+  FALLBACK_QUERIES: {
+    Lager: ['paketsortering','pickare','varuplockare','varuhantering'],
+    Chaufför: ['paketleverans','transportör','bud','utkörare']
+  },
+  ALLOWED_MUNICIPALITIES: [
+    'stockholm','solna','sundbyberg','järfälla','sollentuna','täby','danderyd',
+    'upplands väsby','upplands-väsby','rosersberg','märsta','sigtuna','arlanda',
+    'huddinge','botkyrka','haninge','nacka','tyresö','värmdö','södertälje',
+    'nykvarn','bålsta','kungsängen','vallentuna','norrtälje'
+  ]
+};
+
+// ═══════════════════════════════════════════════════════
+// SUPABASE INIT
+// ═══════════════════════════════════════════════════════
+let supabase = null;
+
+function getSupabaseConfig() {
+  return {
+    url: localStorage.getItem('jp_supabase_url') || CONFIG.SUPABASE_URL,
+    key: localStorage.getItem('jp_supabase_key') || CONFIG.SUPABASE_ANON_KEY,
+  };
+}
+
+function initSupabase() {
+  const { url, key } = getSupabaseConfig();
+  if (!url || url === 'YOUR_SUPABASE_URL' || !key || key === 'YOUR_SUPABASE_ANON_KEY') return null;
+  try { return createClient(url, key); } catch(e) { console.error('Supabase init:', e); return null; }
+}
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const state = {
+  currentBatch: [],
+  seenSet: new Set(),
+  statusMap: {},
+  batchLabel: '',
+  batchNum: 0,
+  lastSynced: null,
+  syncPending: false,
+  filters: { text: '', category: 'all', statuses: [], sort: 'deadline' },
+  stats: { totalt: 0, ansökt: 0, sparade: 0, skrapped: 0 },
+  searching: false,
+};
+
+// ═══════════════════════════════════════════════════════
+// DATA LAYER — localStorage helpers
+// ═══════════════════════════════════════════════════════
+const LS = {
+  get: (k, def) => { try { const v = localStorage.getItem('jp_'+k); return v ? JSON.parse(v) : def; } catch { return def; } },
+  set: (k, v) => { try { localStorage.setItem('jp_'+k, JSON.stringify(v)); } catch {} },
+  del: (k) => { try { localStorage.removeItem('jp_'+k); } catch {} },
+};
+
+// ═══════════════════════════════════════════════════════
+// DATA LAYER — Supabase + localStorage
+// ═══════════════════════════════════════════════════════
+async function getSeenSet() {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('seen_jobs').select('ad_id');
+      if (error) throw error;
+      const ids = data.map(r => r.ad_id);
+      LS.set('seen_ids', ids);
+      return new Set(ids);
+    } catch(e) { console.warn('getSeenSet Supabase fail:', e); }
+  }
+  return new Set(LS.get('seen_ids', []));
+}
+
+async function addToSeen(jobs) {
+  if (!jobs.length) return;
+  const existing = LS.get('seen_ids', []);
+  const merged = [...new Set([...existing, ...jobs.map(j => j.adId)])];
+  LS.set('seen_ids', merged);
+
+  if (!supabase) { markPending(); return; }
+  try {
+    const rows = jobs.map(j => ({
+      ad_id: j.adId, title: j.title, company: j.company,
+      location: j.location, category: j.category,
+      deadline: j.deadline || null, url: j.url,
+      first_seen_at: new Date().toISOString(),
+      batch_label: j.batchLabel || state.batchLabel,
+    }));
+    const { error } = await supabase.from('seen_jobs').upsert(rows, { onConflict: 'ad_id', ignoreDuplicates: true });
+    if (error) throw error;
+  } catch(e) { console.warn('addToSeen Supabase fail:', e); markPending(); }
+}
+
+async function getStatusMap() {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('job_status').select('ad_id,status');
+      if (error) throw error;
+      const map = {};
+      for (const r of data) if (r.status) map[r.ad_id] = r.status;
+      LS.set('status_map', map);
+      return map;
+    } catch(e) { console.warn('getStatusMap Supabase fail:', e); }
+  }
+  return LS.get('status_map', {});
+}
+
+async function setStatus(adId, status) {
+  if (status) state.statusMap[adId] = status;
+  else delete state.statusMap[adId];
+  LS.set('status_map', state.statusMap);
+
+  // Queue for retry if needed
+  if (!supabase) { markPending(); queueStatusWrite(adId, status); return; }
+  try {
+    if (status) {
+      const { error } = await supabase.from('job_status')
+        .upsert({ ad_id: adId, status, updated_at: new Date().toISOString() }, { onConflict: 'ad_id' });
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from('job_status').delete().eq('ad_id', adId);
+      if (error) throw error;
+    }
+  } catch(e) { console.warn('setStatus Supabase fail:', e); markPending(); queueStatusWrite(adId, status); }
+}
+
+function queueStatusWrite(adId, status) {
+  const q = LS.get('status_queue', []);
+  q.push({ adId, status, ts: Date.now() });
+  LS.set('status_queue', q);
+}
+
+async function getCurrentBatch() {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('current_batch')
+        .select('job_data,position,loaded_at').order('position');
+      if (error) throw error;
+      if (data.length) {
+        const jobs = data.map(r => r.job_data);
+        LS.set('current_batch', jobs);
+        if (data[0].loaded_at) state.lastSynced = new Date(data[0].loaded_at);
+        return jobs;
+      }
+    } catch(e) { console.warn('getCurrentBatch Supabase fail:', e); }
+  }
+  return LS.get('current_batch', []);
+}
+
+async function replaceCurrentBatch(jobs) {
+  state.currentBatch = jobs;
+  LS.set('current_batch', jobs);
+  if (!supabase) { markPending(); return; }
+  try {
+    await supabase.from('current_batch').delete().neq('ad_id', '__never__');
+    if (jobs.length) {
+      const now = new Date().toISOString();
+      const rows = jobs.map((j, i) => ({ ad_id: j.adId, job_data: j, position: i, loaded_at: now }));
+      const { error } = await supabase.from('current_batch').insert(rows);
+      if (error) throw error;
+    }
+    state.lastSynced = new Date();
+    state.syncPending = false;
+    updateSyncIndicator();
+  } catch(e) { console.warn('replaceCurrentBatch Supabase fail:', e); markPending(); }
+}
+
+async function flushStatusQueue() {
+  if (!supabase) return;
+  const q = LS.get('status_queue', []);
+  if (!q.length) return;
+  try {
+    for (const item of q) {
+      if (item.status) {
+        await supabase.from('job_status')
+          .upsert({ ad_id: item.adId, status: item.status, updated_at: new Date(item.ts).toISOString() }, { onConflict: 'ad_id' });
+      } else {
+        await supabase.from('job_status').delete().eq('ad_id', item.adId);
+      }
+    }
+    LS.del('status_queue');
+    state.syncPending = false;
+    updateSyncIndicator();
+  } catch(e) { console.warn('flushStatusQueue fail:', e); }
+}
+
+async function exportAll() {
+  try {
+    const seenIds = LS.get('seen_ids', []);
+    const statusMap = state.statusMap;
+    const currentBatch = state.currentBatch;
+    let seenJobs = [];
+    if (supabase) {
+      const { data } = await supabase.from('seen_jobs').select('*');
+      seenJobs = data || [];
+    }
+    const backup = {
+      exportedAt: new Date().toISOString(),
+      batchLabel: state.batchLabel,
+      totalSeen: seenIds.length,
+      seenJobs, statusMap, currentBatch,
+      jobs: seenJobs, // legacy compat
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `jobbportal_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('Backup exporterad!', 'success');
+  } catch(e) { showToast('Export misslyckades: ' + e.message, 'error'); }
+}
+
+async function importBackup(file) {
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const jobs = data.seenJobs || data.jobs || [];
+    const statusMap = data.statusMap || {};
+    const currentBatch = data.currentBatch || [];
+    if (!jobs.length && !currentBatch.length) throw new Error('Ingen jobbdata i filen');
+    if (jobs.length) await importSeenJobsList(jobs);
+    for (const [adId, status] of Object.entries(statusMap)) {
+      state.statusMap[adId] = status;
+    }
+    LS.set('status_map', state.statusMap);
+    if (currentBatch.length) {
+      await replaceCurrentBatch(currentBatch);
+      state.currentBatch = currentBatch;
+    }
+    showToast(`Import klar — ${jobs.length} sett-jobb återställda`, 'success');
+    renderAll();
+  } catch(e) { showToast('Import misslyckades: ' + e.message, 'error'); }
+}
+
+async function importSeenJobsList(jobs) {
+  const existing = LS.get('seen_ids', []);
+  const newIds = jobs.map(j => j.adId || j.ad_id).filter(Boolean);
+  LS.set('seen_ids', [...new Set([...existing, ...newIds])]);
+  state.seenSet = new Set(LS.get('seen_ids', []));
+  if (!supabase) return;
+  try {
+    const rows = jobs.map(j => ({
+      ad_id: j.adId || j.ad_id,
+      title: j.title || '',
+      company: j.company || '',
+      location: j.location || '',
+      category: j.category || 'Okänd',
+      deadline: j.deadline || null,
+      url: j.url || `https://arbetsformedlingen.se/platsbanken/annonser/${j.adId||j.ad_id}`,
+      first_seen_at: new Date().toISOString(),
+      batch_label: j.batch || j.batchLabel || 'Importerad',
+    }));
+    const { error } = await supabase.from('seen_jobs').upsert(rows, { onConflict: 'ad_id', ignoreDuplicates: true });
+    if (error) throw error;
+  } catch(e) { console.warn('importSeenJobsList Supabase fail:', e); }
+}
+
+// ═══════════════════════════════════════════════════════
+// FETCHING
+// ═══════════════════════════════════════════════════════
+async function fetchSearchQuery(keyword) {
+  const url = `${CONFIG.API_BASE}/search?q=${encodeURIComponent(keyword)}&region=${CONFIG.REGION}&limit=100`;
+  const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+  if (!res.ok) throw new Error(`API ${res.status} för "${keyword}"`);
+  const data = await res.json();
+  return data.hits || [];
+}
+
+let searchQueryCount = 0;
+async function fetchAllQueries(useFallback = false) {
+  const queries = useFallback ? CONFIG.FALLBACK_QUERIES : CONFIG.SEARCH_QUERIES;
+  const total = Object.values(queries).flat().length;
+  searchQueryCount = 0;
+  updateSearchProgress(0, total);
+
+  const results = { Lager: [], Chaufför: [] };
+  const seenIds = new Set();
+
+  const promises = Object.entries(queries).flatMap(([category, keywords]) =>
+    keywords.map(async keyword => {
+      try {
+        const hits = await fetchSearchQuery(keyword);
+        searchQueryCount++;
+        updateSearchProgress(searchQueryCount, total);
+        return { category, hits };
+      } catch(e) {
+        searchQueryCount++;
+        updateSearchProgress(searchQueryCount, total);
+        console.warn(`Query "${keyword}" failed:`, e.message);
+        return { category, hits: [] };
+      }
+    })
+  );
+
+  const all = await Promise.all(promises);
+  for (const { category, hits } of all) {
+    for (const hit of hits) {
+      if (!seenIds.has(hit.id)) {
+        seenIds.add(hit.id);
+        results[category].push(hit);
+      }
+    }
+  }
+  return results;
+}
+
+function normalizeJob(hit, category, batchLabel) {
+  const text = hit.description?.text || '';
+  let desc = text.substring(0, 300).trim();
+  const lastDot = desc.lastIndexOf('.');
+  if (lastDot > 120) desc = desc.substring(0, lastDot + 1);
+  else if (desc.length === 300) desc += '…';
+
+  return {
+    adId: hit.id,
+    title: hit.headline || '',
+    company: hit.employer?.name || '',
+    location: hit.workplace_address?.municipality || '',
+    category,
+    employmentType: 'Heltid',
+    deadline: hit.application_deadline ? hit.application_deadline.split('T')[0] : '',
+    url: `https://arbetsformedlingen.se/platsbanken/annonser/${hit.id}`,
+    descriptionSV: desc,
+    publishedAt: hit.publication_date ? hit.publication_date.split('T')[0] : '',
+    source: 'Arbetsförmedlingen',
+    batchLabel,
+    _raw: hit,
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// FILTERING — R1–R12
+// ═══════════════════════════════════════════════════════
+const HARD_EXP = [
+  /\bminst\s+\d+\s*(?:år|års)\b/i,
+  /\b\d+\s*(?:år|års)\s+erfarenhet\b/i,
+  /\b\d+\+?\s*år\b[^.]{0,40}\berfarenhet\b/i,
+  /\berfarenhet\s+(?:som\s+)?krävs\b/i,
+  /\bkrav\s+på\s+erfarenhet\b/i,
+  /\bdu\s+måste\s+ha\s+erfarenhet\b/i,
+  /\bdu\s+ska\s+ha\s+minst\s+\d+\s*år\b/i,
+  /\b\d+\s*år\s+av\s+yrkeserfarenhet\b/i,
+];
+const SOFT_CTX = /meriterande|meriterande\s+är|är\s+meriterande|\bfördel\b|önskvärt|plus\s+om|bonus\s+om|är\s+ett\s+plus/i;
+const HARD_LICENSE = [/\bc[- ]?körkort\b/i, /\bce[- ]?körkort\b/i, /\bd[- ]?körkort\b/i, /\bde[- ]?körkort\b/i, /\bykb\b/i, /\byrkeskompetensbevis\b/i, /\btaxiförarleg/i, /\btaxileg\b/i];
+const TRUCK_TERMS = /truckkort|motvikt(?:truck)?|skjutstativ|åkstaplare|terminaltruck|tlp\s*10|a1-truck|a2-truck|b1-truck/i;
+const TRUCK_HARD = /\b(krav|måste|krävs|obligat|kräver)\b/i;
+const TRUCK_SOFT = /meriterande|fördel|önskvärt|plus/i;
+const BLACKLIST_TEXT = [
+  /\btaxi(?:chaufför|förare|leg)\b/i,
+  /färdtjänst.*taxi|taxi.*färdtjänst/i,
+  /\buber\b|\bbolt\b/i,
+  /bussförare|buss\s*chaufför|spårtrafik|tunnelbana\s*förar/i,
+  /f-skatt\s+krävs|eget\s+fordon\s+krävs/i,
+  /\btelemarketing\b|\bd2d\b|door.to.door/i,
+  /lastbilschaufför[^.]{0,50}ce?-körkort|ce?-körkort[^.]{0,50}lastbilschaufför/i,
+];
+const BLACKLIST_TITLE = [
+  /\btaxi\b/i, /bussförare|buss\s*chaufför/i, /säljare|account\s*manager/i,
+  /systemutvecklare|programmerare|\bit\s*konsult/i, /truckförare|truck\s*förar/i,
+];
+const CLEAN_RECORD = /rent?\s+belastningsregister\s+krävs|belastningsregister\s+(?:utan|som\s+är\s+rent?)|(?:kräver|krav\s+på)\s+(?:ett\s+)?rent?\s+belastningsregister/i;
+
+function getText(hit) { return (hit.description?.text || '') + ' ' + (hit.headline || ''); }
+
+function passesR1(hit, today) {
+  const d = hit.application_deadline;
+  if (!d) return false;
+  const dt = new Date(d);
+  return !isNaN(dt) && dt > today;
+}
+
+function passesR2(hit) {
+  const wht = hit.working_hours_type;
+  if (!wht) return false;
+  return wht.concept_id === '6YE1_gAC_R2G' || (wht.label || '').toLowerCase() === 'heltid';
+}
+
+function passesR3(hit) {
+  const text = getText(hit);
+  for (const pat of HARD_EXP) {
+    const m = pat.exec(text);
+    if (m) {
+      const ctx = text.substring(Math.max(0, m.index - 80), m.index + m[0].length + 80);
+      if (!SOFT_CTX.test(ctx)) return false;
+    }
+  }
+  return true;
+}
+
+function passesR4(hit) {
+  const text = getText(hit).toLowerCase();
+  for (const p of HARD_LICENSE) { if (p.test(text)) return false; }
+  // Manual transmission as hard requirement
+  if (/manuell\s+växellåda/i.test(text)) {
+    const m = /manuell\s+växellåda/i.exec(text);
+    if (m) {
+      const ctx = text.substring(Math.max(0, m.index - 80), m.index + 80);
+      if (TRUCK_HARD.test(ctx) && !TRUCK_SOFT.test(ctx)) return false;
+    }
+  }
+  // Truckkort
+  const tm = [...text.matchAll(new RegExp(TRUCK_TERMS, 'gi'))];
+  for (const m of tm) {
+    const ctx = text.substring(Math.max(0, m.index - 100), m.index + 100);
+    const isHard = TRUCK_HARD.test(ctx);
+    if (isHard && !TRUCK_SOFT.test(ctx)) return false;
+    if (!isHard) {
+      if (/truckförar|truck\s*sätt/i.test(hit.headline || '')) return false;
+    }
+  }
+  // Own car as hard requirement
+  if (/eget\s+fordon\s+krävs|krav\s+på\s+eget\s+fordon|måste\s+ha\s+eget\s+(?:fordon|bil)/i.test(text)) return false;
+  return true;
+}
+
+function passesR5(hit) {
+  const text = getText(hit);
+  const title = hit.headline || '';
+  for (const p of BLACKLIST_TEXT) if (p.test(text)) return false;
+  for (const p of BLACKLIST_TITLE) if (p.test(title)) return false;
+  return true;
+}
+
+function passesR6(hit) {
+  const mun = (hit.workplace_address?.municipality || '').toLowerCase().trim();
+  if (!mun) return false;
+  return CONFIG.ALLOWED_MUNICIPALITIES.some(m => mun === m || mun.startsWith(m) || m.startsWith(mun));
+}
+
+function passesR7(hit) { return !CLEAN_RECORD.test(getText(hit)); }
+function passesR8(adId, seenSet) { return !seenSet.has(adId); }
+
+function jobPasses(hit, seenSet, today) {
+  return passesR1(hit, today) &&
+         passesR2(hit) &&
+         passesR3(hit) &&
+         passesR4(hit) &&
+         passesR5(hit) &&
+         passesR6(hit) &&
+         passesR7(hit) &&
+         passesR8(hit.id, seenSet);
+}
+
+function dedupBatch(hits) {
+  const ids = new Set();
+  const pairs = new Set();
+  return hits.filter(h => {
+    const id = h.id;
+    const pair = `${(h.headline||'').toLowerCase()}|${(h.employer?.name||'').toLowerCase()}`;
+    if (ids.has(id) || pairs.has(pair)) return false;
+    ids.add(id); pairs.add(pair);
+    return true;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// SEARCH ORCHESTRATOR
+// ═══════════════════════════════════════════════════════
+let searchDebounce = false;
+
+async function runJobSearch() {
+  if (state.searching || searchDebounce) return;
+  showModal('modal-confirm');
+}
+
+async function executeSearch() {
+  if (state.searching) return;
+  state.searching = true;
+  searchDebounce = true;
+  setTimeout(() => { searchDebounce = false; }, 3000);
+
+  hideModal('modal-confirm');
+  showEl('search-overlay');
+
+  try {
+    // Archive current batch
+    if (state.currentBatch.length) {
+      updateSearchText('Arkiverar nuvarande jobb…', '');
+      await addToSeen(state.currentBatch);
+    }
+
+    // Fetch all 10 queries
+    updateSearchText('Söker via Arbetsförmedlingen…', `0 / 10 frågor klara`);
+    let raw = await fetchAllQueries(false);
+
+    // Get fresh seen set
+    updateSearchText('Filtrerar resultat…', '');
+    const seenSet = await getSeenSet();
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    // Build batch label
+    state.batchNum = LS.get('batch_num', 0) + 1;
+    LS.set('batch_num', state.batchNum);
+    const batchLabel = `Batch ${state.batchNum}`;
+
+    // Normalize + filter each category
+    function processCategory(hits, category) {
+      return dedupBatch(hits.filter(h => jobPasses(h, seenSet, today)))
+        .map(h => normalizeJob(h, category, batchLabel))
+        .sort((a, b) => {
+          const da = a.deadline ? new Date(a.deadline) : new Date('9999-12-31');
+          const db = b.deadline ? new Date(b.deadline) : new Date('9999-12-31');
+          return da - db;
+        })
+        .slice(0, CONFIG.TARGET_PER_CATEGORY);
+    }
+
+    let lager = processCategory(raw.Lager, 'Lager');
+    let chauffeur = processCategory(raw.Chaufför, 'Chaufför');
+
+    // Fallback if short
+    const needFallback = lager.length < CONFIG.TARGET_PER_CATEGORY || chauffeur.length < CONFIG.TARGET_PER_CATEGORY;
+    if (needFallback) {
+      updateSearchText('Breddar sökning…', 'Hämtar extra sökfrågor');
+      const fb = await fetchAllQueries(true);
+
+      // Add fallback hits that aren't already in the seen set or our current results
+      const alreadyAdded = new Set([...lager.map(j=>j.adId), ...chauffeur.map(j=>j.adId)]);
+      const fbSeenSet = new Set([...seenSet, ...alreadyAdded]);
+
+      if (lager.length < CONFIG.TARGET_PER_CATEGORY) {
+        const extra = processCategory(fb.Lager.filter(h => !alreadyAdded.has(h.id)), 'Lager');
+        lager = [...lager, ...extra].slice(0, CONFIG.TARGET_PER_CATEGORY);
+      }
+      if (chauffeur.length < CONFIG.TARGET_PER_CATEGORY) {
+        const extra = processCategory(fb.Chaufför.filter(h => !alreadyAdded.has(h.id)), 'Chaufför');
+        chauffeur = [...chauffeur, ...extra].slice(0, CONFIG.TARGET_PER_CATEGORY);
+      }
+    }
+
+    if (!lager.length && !chauffeur.length) {
+      showToast('Inga nya jobb hittades just nu. Nuvarande batch behålls.', 'warn');
+      return;
+    }
+
+    updateSearchText('Sparar nya jobb…', '');
+    const newBatch = [...lager, ...chauffeur];
+    state.batchLabel = batchLabel;
+    await replaceCurrentBatch(newBatch);
+
+    // Update seen set
+    state.seenSet = await getSeenSet();
+    state.statusMap = await getStatusMap();
+
+    // Re-render
+    renderAll();
+
+    const msg = `${newBatch.length} nya jobb — ${lager.length} lager, ${chauffeur.length} chaufför`;
+    showToast(msg, 'success');
+
+    if (lager.length < CONFIG.TARGET_PER_CATEGORY || chauffeur.length < CONFIG.TARGET_PER_CATEGORY) {
+      showShortSupplyBanner(lager.length, chauffeur.length);
+    }
+
+  } catch(e) {
+    console.error('Search error:', e);
+    showToast(`Sökning misslyckades: ${e.message}`, 'error');
+  } finally {
+    state.searching = false;
+    hideEl('search-overlay');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDERING
+// ═══════════════════════════════════════════════════════
+const SV_MONTHS = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+
+function fmtDate(str) {
+  if (!str) return '–';
+  const d = new Date(str + (str.includes('T') ? '' : 'T00:00:00'));
+  return `${d.getDate()} ${SV_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function deadlineBadge(deadlineStr) {
+  if (!deadlineStr) return { label: '–', cls: 'badge-neutral' };
+  const d = new Date(deadlineStr + 'T23:59:59');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = Math.ceil((d - today) / 86400000);
+  if (days <= 0) return { label: 'Stängd', cls: 'badge-urgent' };
+  if (days <= 7) return { label: `${days}d kvar`, cls: 'badge-urgent' };
+  if (days <= 14) return { label: `${days}d kvar`, cls: 'badge-soon' };
+  const dd = new Date(deadlineStr);
+  return { label: `${dd.getDate()} ${SV_MONTHS[dd.getMonth()]}`, cls: 'badge-neutral' };
+}
+
+function computeStats() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const batch = state.currentBatch;
+
+  const lagerCount = batch.filter(j => j.category === 'Lager').length;
+  const chauffeurCount = batch.filter(j => j.category === 'Chaufför').length;
+  const urgentCount = batch.filter(j => {
+    if (!j.deadline) return false;
+    const d = new Date(j.deadline + 'T23:59:59');
+    return Math.ceil((d - today) / 86400000) <= 7;
+  }).length;
+
+  let ansökt = 0, sparade = 0, skrapped = 0;
+  for (const v of Object.values(state.statusMap)) {
+    if (v === 'a') ansökt++;
+    else if (v === 's') sparade++;
+    else if (v === 'x') skrapped++;
+  }
+
+  return { lager: lagerCount, chauffeur: chauffeurCount, urgent: urgentCount, ansökt, sparade, skrapped };
+}
+
+function renderStats() {
+  const st = computeStats();
+  const totalt = state.seenSet.size || LS.get('seen_ids', []).length;
+
+  setText('stat-totalt', totalt);
+  setText('stat-lager', st.lager);
+  setText('stat-chauffeur', st.chauffeur);
+  setText('stat-urgent', st.urgent);
+  setText('stat-ansökt', st.ansökt);
+  setText('stat-sparade', st.sparade);
+  setText('stat-skrapped', st.skrapped);
+
+  const batchNum = LS.get('batch_num', 0);
+  const dateStr = state.lastSynced ? fmtDate(state.lastSynced.toISOString()) : fmtDate(new Date().toISOString());
+  setText('batch-badge', `Batch ${batchNum} · ${state.currentBatch.length} jobb · ${dateStr}`);
+  if (state.lastSynced) setText('footer-sync', `Senast synkad: ${fmtDate(state.lastSynced.toISOString())}`);
+}
+
+function applyFilters(jobs) {
+  const { text, category, statuses, sort } = state.filters;
+  const q = text.toLowerCase().trim();
+
+  let filtered = jobs.filter(job => {
+    if (q) {
+      const haystack = `${job.title} ${job.company} ${job.location}`.toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+    if (category !== 'all' && job.category !== category) return false;
+    const s = state.statusMap[job.adId];
+    if (statuses.length && !statuses.includes(s || '')) return false;
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    switch (sort) {
+      case 'deadline': {
+        const da = a.deadline ? new Date(a.deadline) : new Date('9999-12-31');
+        const db = b.deadline ? new Date(b.deadline) : new Date('9999-12-31');
+        return da - db;
+      }
+      case 'company': return (a.company||'').localeCompare(b.company||'', 'sv');
+      case 'location': return (a.location||'').localeCompare(b.location||'', 'sv');
+      case 'status': {
+        const ord = { a: 0, s: 1, x: 3, undefined: 2 };
+        return (ord[state.statusMap[a.adId]] ?? 2) - (ord[state.statusMap[b.adId]] ?? 2);
+      }
+      case 'batch': return (a.batchLabel||'').localeCompare(b.batchLabel||'', 'sv');
+      default: return 0;
+    }
+  });
+
+  return filtered;
+}
+
+function createJobCard(job) {
+  const status = state.statusMap[job.adId] || '';
+  const isCat = job.category === 'Lager' ? 'cat-lager' : 'cat-chauffeur';
+  const db = deadlineBadge(job.deadline);
+  const statusCls = status ? `status-${status}` : '';
+
+  // Featured: deadline is urgent or soon — gets 2-col span + persistent bento glow
+  const isFeatured = db.cls === 'badge-urgent' || db.cls === 'badge-soon';
+  const featuredCls = isFeatured ? 'featured' : '';
+
+  // Status pill class (bento style): map badge-urgent/soon to pill modifiers
+  const pillCls = db.cls === 'badge-urgent' ? 'urgent'
+                : db.cls === 'badge-soon' ? 'soon' : '';
+
+  // Category icon
+  const catIcon = job.category === 'Lager' ? 'inventory_2' : 'local_shipping';
+
+  const card = document.createElement('div');
+  card.className = `job-card ${isCat} ${statusCls} ${featuredCls}`.trim().replace(/\s+/g, ' ');
+  card.dataset.adId = job.adId;
+
+  const escHtml = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const safetitle = escHtml(job.title || '');
+  const safecompany = escHtml(job.company || '');
+  const safelocation = escHtml(job.location || '');
+  const safedesc = escHtml(job.descriptionSV || '');
+  const safeurl = encodeURI(job.url || '#');
+  const safedate = escHtml(fmtDate(job.publishedAt));
+
+  const btnAState = status === 'a' ? 'active' : '';
+  const btnSState = status === 's' ? 'active' : '';
+  const btnXState = status === 'x' ? 'active' : '';
+
+  card.innerHTML = `
+    <div class="card-stripe" aria-hidden="true"></div>
+    <div class="card-body">
+      <div class="card-top-row">
+        <span class="card-icon-chip" aria-hidden="true">
+          <span class="material-symbols-outlined">${catIcon}</span>
+        </span>
+        <span class="card-status-pill ${pillCls}">
+          ${escHtml(db.label)}
+        </span>
+      </div>
+      <div class="card-title-block">
+        <h3 class="card-title">${safetitle}</h3>
+        <span class="card-employer">${safecompany || '–'}</span>
+      </div>
+      <p class="card-desc">${safedesc}</p>
+      <div class="card-tags-row">
+        <div class="card-tags">
+          <span class="card-tag">#${escHtml(job.category)}</span>
+          ${safelocation ? `<span class="card-tag">#${safelocation}</span>` : ''}
+          <span class="card-tag">#${safedate}</span>
+        </div>
+        <span class="card-explore">Utforska →</span>
+      </div>
+      <div class="card-footer">
+        <a class="open-link" href="${safeurl}" target="_blank" rel="noopener noreferrer" aria-label="Öppna annons för ${safetitle}">
+          ÖPPNA ANNONS
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+        <div class="btn-group">
+          <button class="btn-status btn-ansökt ${btnAState}" data-ad-id="${job.adId}" data-s="a" aria-label="Markera som ansökt" aria-pressed="${status === 'a'}">
+            <span class="material-symbols-outlined">send</span>
+            Ansökt
+          </button>
+          <button class="btn-status btn-sparad ${btnSState}" data-ad-id="${job.adId}" data-s="s" aria-label="Spara jobb" aria-pressed="${status === 's'}">
+            <span class="material-symbols-outlined">bookmark</span>
+            Spara
+          </button>
+          <button class="btn-status btn-skrap ${btnXState}" data-ad-id="${job.adId}" data-s="x" aria-label="Skrappa jobb" aria-pressed="${status === 'x'}">
+            <span class="material-symbols-outlined">delete</span>
+            Skrap
+          </button>
+        </div>
+      </div>
+    </div>`;
+
+  return card;
+}
+
+function renderJobs() {
+  const grid = document.getElementById('job-grid');
+  const empty = document.getElementById('empty-state');
+  const filtered = applyFilters(state.currentBatch);
+
+  grid.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  for (const job of filtered) frag.appendChild(createJobCard(job));
+  grid.appendChild(frag);
+
+  setText('result-count', `${filtered.length} annons${filtered.length !== 1 ? 'er' : ''}`);
+
+  const isEmpty = !filtered.length;
+  toggleEl('empty-state', isEmpty);
+  if (isEmpty && !state.currentBatch.length) {
+    setText('empty-state-msg', "Klicka på 'Sök Jobb' för att hämta 50 nya annonser från Arbetsförmedlingen.");
+  } else if (isEmpty) {
+    setText('empty-state-msg', "Inga jobb matchar nuvarande filter. Testa att rensa filtren.");
+    hideEl('btn-sök-empty');
+  }
+}
+
+function renderAll() {
+  renderStats();
+  renderJobs();
+}
+
+function showShortSupplyBanner(lager, chauffeur) {
+  const existing = document.querySelector('.supply-banner');
+  if (existing) existing.remove();
+  if (lager >= 25 && chauffeur >= 25) return;
+
+  const banner = document.createElement('div');
+  banner.className = 'supply-banner';
+  const msgs = [];
+  if (lager < 25) msgs.push(`Endast ${lager} lagerjobb hittades`);
+  if (chauffeur < 25) msgs.push(`Endast ${chauffeur} chaufförjobb hittades`);
+  banner.innerHTML = `<span>${msgs.join(' · ')}</span>`;
+  document.getElementById('job-grid').prepend(banner);
+}
+
+// ═══════════════════════════════════════════════════════
+// EVENT HANDLERS
+// ═══════════════════════════════════════════════════════
+function bindEvents() {
+  // Sök Jobb
+  document.getElementById('btn-sök-jobb').addEventListener('click', runJobSearch);
+  document.getElementById('btn-sök-empty').addEventListener('click', runJobSearch);
+  document.getElementById('mnav-search').addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(runJobSearch, 400);
+  });
+
+  // Confirm modal
+  document.getElementById('btn-confirm-ok').addEventListener('click', executeSearch);
+  document.getElementById('btn-confirm-cancel').addEventListener('click', () => hideModal('modal-confirm'));
+
+  // Export
+  document.getElementById('btn-export').addEventListener('click', exportAll);
+
+  // Import backup
+  document.getElementById('input-import-backup').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (file) { await importBackup(file); e.target.value = ''; }
+  });
+
+  // Settings
+  document.getElementById('btn-settings').addEventListener('click', openSettings);
+  document.getElementById('btn-settings-cancel').addEventListener('click', () => hideModal('modal-settings'));
+  document.getElementById('btn-settings-save').addEventListener('click', saveSettings);
+  document.getElementById('btn-reset-all').addEventListener('click', resetAllData);
+
+  // Search input
+  let searchTimer;
+  document.getElementById('input-search').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { state.filters.text = e.target.value; renderJobs(); }, 200);
+  });
+
+  // Category chips
+  document.querySelectorAll('[data-cat]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-cat]').forEach(b => b.dataset.active = 'false');
+      btn.dataset.active = 'true';
+      state.filters.category = btn.dataset.cat;
+      renderJobs();
+    });
+  });
+
+  // Status chips
+  document.querySelectorAll('[data-status]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const s = btn.dataset.status;
+      const isActive = btn.dataset.active === 'true';
+      btn.dataset.active = isActive ? 'false' : 'true';
+      btn.setAttribute('aria-pressed', !isActive);
+      if (isActive) {
+        state.filters.statuses = state.filters.statuses.filter(x => x !== s);
+      } else {
+        state.filters.statuses.push(s);
+      }
+      renderJobs();
+    });
+  });
+
+  // Stat clickable filters
+  document.getElementById('btn-stat-ansökt').addEventListener('click', () => toggleStatFilter('a'));
+  document.getElementById('btn-stat-sparade').addEventListener('click', () => toggleStatFilter('s'));
+  document.getElementById('btn-stat-skrapped').addEventListener('click', () => toggleStatFilter('x'));
+
+  // Sort
+  document.getElementById('select-sort').addEventListener('change', e => {
+    state.filters.sort = e.target.value;
+    renderJobs();
+  });
+
+  // Job grid status buttons (event delegation)
+  document.getElementById('job-grid').addEventListener('click', async e => {
+    const btn = e.target.closest('[data-s]');
+    if (!btn) return;
+    const adId = btn.dataset.adId;
+    const newStatus = btn.dataset.s;
+    const currentStatus = state.statusMap[adId];
+    const finalStatus = currentStatus === newStatus ? null : newStatus;
+
+    await setStatus(adId, finalStatus);
+    renderAll();
+  });
+
+  // Mobile nav
+  document.getElementById('mnav-home').addEventListener('click', () => {
+    // Clear all filters
+    state.filters = { text: '', category: 'all', statuses: [], sort: 'deadline' };
+    document.getElementById('input-search').value = '';
+    document.querySelectorAll('[data-cat]').forEach(b => b.dataset.active = 'false');
+    document.getElementById('chip-all').dataset.active = 'true';
+    document.querySelectorAll('[data-status]').forEach(b => { b.dataset.active = 'false'; b.setAttribute('aria-pressed','false'); });
+    renderJobs();
+    setMobileNavActive('mnav-home');
+  });
+  document.getElementById('mnav-saved').addEventListener('click', () => {
+    state.filters.statuses = ['s'];
+    document.querySelectorAll('[data-status]').forEach(b => { b.dataset.active = 'false'; b.setAttribute('aria-pressed','false'); });
+    const chip = document.getElementById('chip-sparade');
+    chip.dataset.active = 'true'; chip.setAttribute('aria-pressed', 'true');
+    renderJobs();
+    setMobileNavActive('mnav-saved');
+  });
+  document.getElementById('mnav-applied').addEventListener('click', () => {
+    state.filters.statuses = ['a'];
+    document.querySelectorAll('[data-status]').forEach(b => { b.dataset.active = 'false'; b.setAttribute('aria-pressed','false'); });
+    const chip = document.getElementById('chip-ansökt');
+    chip.dataset.active = 'true'; chip.setAttribute('aria-pressed', 'true');
+    renderJobs();
+    setMobileNavActive('mnav-applied');
+  });
+
+  // Migration modal
+  const dropzone = document.getElementById('migration-dropzone');
+  const migFile = document.getElementById('input-migration-file');
+  const migName = document.getElementById('migration-file-name');
+  const migImport = document.getElementById('btn-migration-import');
+
+  dropzone.addEventListener('click', () => migFile.click());
+  dropzone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') migFile.click(); });
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault(); dropzone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) handleMigrationFile(f);
+  });
+  migFile.addEventListener('change', e => { if (e.target.files[0]) handleMigrationFile(e.target.files[0]); });
+
+  let migrationFile = null;
+  function handleMigrationFile(file) {
+    migrationFile = file;
+    migName.textContent = `✓ ${file.name}`;
+    migName.classList.remove('hidden');
+    migImport.disabled = false;
+  }
+  document.getElementById('btn-migration-skip').addEventListener('click', () => {
+    hideModal('modal-migration');
+    showToast('Hoppar över migration. Du kan importera senare via "Importera backup".', 'warn');
+  });
+  document.getElementById('btn-migration-import').addEventListener('click', async () => {
+    if (!migrationFile) return;
+    hideModal('modal-migration');
+    showToast('Importerar…', 'info');
+    await importBackup(migrationFile);
+    state.seenSet = await getSeenSet();
+    renderStats();
+  });
+
+  // Close modals on overlay click
+  ['modal-confirm','modal-migration','modal-settings'].forEach(id => {
+    document.getElementById(id).addEventListener('click', e => {
+      if (e.target.id === id) hideModal(id);
+    });
+  });
+
+  // Keyboard: Escape closes modals
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      ['modal-confirm','modal-migration','modal-settings'].forEach(hideModal);
+    }
+  });
+}
+
+function toggleStatFilter(status) {
+  const idx = state.filters.statuses.indexOf(status);
+  if (idx >= 0) {
+    state.filters.statuses.splice(idx, 1);
+    document.getElementById('btn-stat-' + (status==='a'?'ansökt':status==='s'?'sparade':'skrapped')).classList.remove('active');
+  } else {
+    state.filters.statuses.push(status);
+    document.getElementById('btn-stat-' + (status==='a'?'ansökt':status==='s'?'sparade':'skrapped')).classList.add('active');
+  }
+  renderJobs();
+}
+
+function setMobileNavActive(id) {
+  document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+function openSettings() {
+  const { url, key } = getSupabaseConfig();
+  const urlInput = document.getElementById('input-supabase-url');
+  const keyInput = document.getElementById('input-supabase-key');
+  if (url !== 'YOUR_SUPABASE_URL') urlInput.value = url;
+  if (key !== 'YOUR_SUPABASE_ANON_KEY') keyInput.value = key;
+
+  const statusEl = document.getElementById('supabase-status-display');
+  if (supabase) {
+    statusEl.className = 'supabase-status connected';
+    statusEl.textContent = '✓ Supabase ansluten';
+  } else {
+    statusEl.className = 'supabase-status offline';
+    statusEl.textContent = 'Ej ansluten — kör i localStorage-läge';
+  }
+  showModal('modal-settings');
+}
+
+function saveSettings() {
+  const url = document.getElementById('input-supabase-url').value.trim();
+  const key = document.getElementById('input-supabase-key').value.trim();
+  if (url) LS.set('supabase_url', url);
+  if (key) LS.set('supabase_key', key);
+  // Override with correct LS keys used by getSupabaseConfig
+  if (url) localStorage.setItem('jp_supabase_url', url);
+  if (key) localStorage.setItem('jp_supabase_key', key);
+  hideModal('modal-settings');
+  showToast('Inställningar sparade — laddar om…', 'success');
+  setTimeout(() => location.reload(), 1400);
+}
+
+async function resetAllData() {
+  if (!confirm('VARNING: Detta raderar ALL data — sedda jobb, statusar och nuvarande batch. Kan ej ångras. Fortsätt?')) return;
+  for (const k of Object.keys(localStorage)) {
+    if (k.startsWith('jp_')) localStorage.removeItem(k);
+  }
+  if (supabase) {
+    try {
+      await Promise.all([
+        supabase.from('current_batch').delete().neq('ad_id', '__never__'),
+        supabase.from('job_status').delete().neq('ad_id', '__never__'),
+        supabase.from('seen_jobs').delete().neq('ad_id', '__never__'),
+      ]);
+    } catch(e) { console.warn('Reset Supabase fail:', e); }
+  }
+  showToast('All data raderad — laddar om…', 'info');
+  setTimeout(() => location.reload(), 1400);
+}
+
+// ═══════════════════════════════════════════════════════
+// MIGRATION CHECK
+// ═══════════════════════════════════════════════════════
+async function checkMigration() {
+  if (!supabase) return; // only show if Supabase is configured
+  try {
+    const { count, error } = await supabase.from('seen_jobs').select('*', { count: 'exact', head: true });
+    if (!error && count === 0 && !LS.get('migration_skipped', false)) {
+      showModal('modal-migration');
+    }
+  } catch(e) { /* ignore */ }
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST + MODAL SYSTEM
+// ═══════════════════════════════════════════════════════
+function showToast(message, type = 'info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = message;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.classList.add('out');
+    t.addEventListener('animationend', () => t.remove(), { once: true });
+  }, 3200);
+}
+
+function showModal(id) { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+function hideModal(id) {
+  document.getElementById(id).classList.add('hidden');
+  const anyOpen = ['modal-confirm','modal-migration','modal-settings'].some(i => !document.getElementById(i).classList.contains('hidden'));
+  if (!anyOpen) document.body.style.overflow = '';
+}
+
+// ═══════════════════════════════════════════════════════
+// SYNC INDICATOR
+// ═══════════════════════════════════════════════════════
+function markPending() {
+  state.syncPending = true;
+  updateSyncIndicator();
+}
+function updateSyncIndicator() {
+  const el = document.getElementById('sync-indicator');
+  if (state.syncPending) {
+    el.classList.remove('hidden');
+    setText('sync-text', supabase ? 'Sync pending' : 'Offline-läge — data i localStorage');
+  } else {
+    el.classList.add('hidden');
+  }
+}
+function startSyncRetry() {
+  setInterval(async () => {
+    if (!state.syncPending || !supabase) return;
+    try {
+      await flushStatusQueue();
+    } catch(e) { /* retry next interval */ }
+  }, 30000);
+}
+
+// ═══════════════════════════════════════════════════════
+// SEARCH PROGRESS UI
+// ═══════════════════════════════════════════════════════
+function updateSearchText(status, queries) {
+  const s = document.getElementById('search-status-text');
+  const q = document.getElementById('search-queries-text');
+  if (s) s.textContent = status;
+  if (q) q.textContent = queries;
+}
+function updateSearchProgress(done, total) {
+  updateSearchText('Söker via Arbetsförmedlingen…', `${done} / ${total} frågor klara`);
+}
+
+// ═══════════════════════════════════════════════════════
+// STAR FIELD (decorative)
+// ═══════════════════════════════════════════════════════
+function initStarField() {
+  const container = document.getElementById('star-field');
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 140; i++) {
+    const s = document.createElement('span');
+    s.className = 'star';
+    const size = Math.random() * 2 + 0.4;
+    const delay = Math.random() * 6;
+    const dur = Math.random() * 4 + 2.5;
+    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;opacity:${Math.random()*.5+.1};animation:twinkle ${dur}s ${delay}s ease-in-out infinite alternate;`;
+    frag.appendChild(s);
+  }
+  container.appendChild(frag);
+}
+
+// ═══════════════════════════════════════════════════════
+// DOM HELPERS
+// ═══════════════════════════════════════════════════════
+function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function showEl(id) { document.getElementById(id)?.classList.remove('hidden'); }
+function hideEl(id) { document.getElementById(id)?.classList.add('hidden'); }
+function toggleEl(id, show) { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', !show); }
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  initStarField();
+
+  supabase = initSupabase();
+  if (!supabase) updateSyncIndicator();
+
+  // Show loading skeleton
+  const grid = document.getElementById('job-grid');
+  grid.innerHTML = Array(6).fill('<div class="skeleton-card"></div>').join('');
+
+  try {
+    [state.seenSet, state.statusMap, state.currentBatch] = await Promise.all([
+      getSeenSet(),
+      getStatusMap(),
+      getCurrentBatch(),
+    ]);
+  } catch(e) {
+    console.error('Init load failed:', e);
+    state.seenSet = new Set(LS.get('seen_ids', []));
+    state.statusMap = LS.get('status_map', {});
+    state.currentBatch = LS.get('current_batch', []);
+  }
+
+  state.batchNum = LS.get('batch_num', 0);
+  state.batchLabel = `Batch ${state.batchNum}`;
+
+  bindEvents();
+  startSyncRetry();
+  renderAll();
+
+  // Pre-fill settings modal with saved values
+  const { url, key } = getSupabaseConfig();
+  if (url !== 'YOUR_SUPABASE_URL') document.getElementById('input-supabase-url').value = url;
+  if (key !== 'YOUR_SUPABASE_ANON_KEY') document.getElementById('input-supabase-key').value = key;
+
+  // Check migration (after a short delay so UI is rendered first)
+  setTimeout(checkMigration, 800);
+});
+</script>
+</body>
+</html>
